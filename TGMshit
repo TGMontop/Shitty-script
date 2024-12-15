@@ -1,0 +1,254 @@
+-- Services
+local userInputService = game:GetService("UserInputService")
+local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+screenGui.Name = "ExecutorGUI"
+
+-- Create Main Frame
+local frame = Instance.new("Frame")
+frame.Parent = screenGui
+frame.Size = UDim2.new(0, 400, 0, 200)
+frame.Position = UDim2.new(0.5, -200, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BackgroundTransparency = 0.2
+frame.BorderSizePixel = 0
+frame.Visible = true
+
+-- Add Shadow Effect
+local shadow = Instance.new("ImageLabel")
+shadow.Parent = frame
+shadow.Size = UDim2.new(1, 20, 1, 20)
+shadow.Position = UDim2.new(0, -10, 0, -10)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageColor3 = Color3.new(0, 0, 0)
+shadow.ImageTransparency = 0.7
+
+-- Add Top Bar
+local topBar = Instance.new("Frame")
+topBar.Parent = frame
+topBar.Size = UDim2.new(1, 0, 0, 30)
+topBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+topBar.BorderSizePixel = 0
+
+-- Title Label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Parent = topBar
+titleLabel.Size = UDim2.new(1, -80, 1, 0)
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Executor GUI"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 16
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Parent = topBar
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -40, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 18
+
+-- Settings Button
+local settingsButton = Instance.new("TextButton")
+settingsButton.Parent = topBar
+settingsButton.Size = UDim2.new(0, 60, 0, 30)
+settingsButton.Position = UDim2.new(0, 10, 0, 0)
+settingsButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+settingsButton.Text = "Settings"
+settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+settingsButton.Font = Enum.Font.Gotham
+settingsButton.TextSize = 14
+
+-- Settings Panel
+local settingsPanel = Instance.new("ScrollingFrame")
+settingsPanel.Parent = screenGui
+settingsPanel.Size = UDim2.new(0, 300, 0, 200)
+settingsPanel.Position = UDim2.new(0.5, 50, 0.5, -100)
+settingsPanel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+settingsPanel.BackgroundTransparency = 0.1
+settingsPanel.BorderSizePixel = 0
+settingsPanel.Visible = false
+settingsPanel.CanvasSize = UDim2.new(0, 0, 0, 300)
+
+-- UNLOAD Button
+local unloadButton = Instance.new("TextButton")
+unloadButton.Parent = settingsPanel
+unloadButton.Size = UDim2.new(0.8, 0, 0, 40)
+unloadButton.Position = UDim2.new(0.1, 0, 0.1, 0)
+unloadButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+unloadButton.Text = "UNLOAD"
+unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+unloadButton.Font = Enum.Font.GothamBold
+unloadButton.TextSize = 16
+
+-- Draggable Top Bar
+local dragging, dragStart, startPos
+topBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+topBar.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+topBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Toggle Visibility
+local function toggleVisibility(gui)
+    gui.Visible = not gui.Visible
+end
+
+-- Connect Buttons
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+settingsButton.MouseButton1Click:Connect(function()
+    toggleVisibility(settingsPanel)
+end)
+
+unloadButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- Listen for Ctrl Key
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode.LeftControl and not gameProcessed then
+        toggleVisibility(frame)
+    end
+end)
+
+-- Resize functionality
+local function resizeElement(element)
+    local resize
+    local dragging
+    local dragStart
+    local startSize
+
+    local function startDrag(input)
+        dragStart = input.Position
+        startSize = element.Size
+        dragging = true
+    end
+
+    local function drag(input)
+        if dragging then
+            local delta = input.Position - dragStart
+            element.Size = UDim2.new(startSize.X.Scale, startSize.X.Offset + delta.X, startSize.Y.Scale, startSize.Y.Offset + delta.Y)
+        end
+    end
+
+    local function stopDrag()
+        dragging = false
+    end
+
+    element.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            startDrag(input)
+        end
+    end)
+
+    element.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            drag(input)
+        end
+    end)
+
+    element.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            stopDrag()
+        end
+    end)
+end
+
+-- Create Image Slot
+local imageSlot = Instance.new("ImageLabel")
+imageSlot.Parent = frame
+imageSlot.Size = UDim2.new(0, 150, 0, 150)
+imageSlot.Position = UDim2.new(0, 0, 0.5, -75)
+imageSlot.BackgroundTransparency = 1
+imageSlot.BorderSizePixel = 0
+imageSlot.AnchorPoint = Vector2.new(0, 0.5)
+
+-- Input Field for Image Link
+local imageInput = Instance.new("TextBox")
+imageInput.Parent = imageSlot
+imageInput.Size = UDim2.new(1, 0, 0, 30)
+imageInput.Position = UDim2.new(0, 0, 1, -30)
+imageInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+imageInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+imageInput.Font = Enum.Font.Code
+imageInput.TextSize = 14
+imageInput.PlaceholderText = "https://images-ext-1.discordapp.net/external/JMY2d6KkBvZNr0JtyIpHd1OrtEwpp3PcyT3yAaGz3pM/https/cdn.discordapp.com/avatars/1284999547017367726/e65f711d837609bc75c35e6b098aab08.webp?format=webp"
+imageInput.ClearTextOnFocus = true
+
+imageInput.FocusLost:Connect(function()
+    local link = imageInput.Text
+    imageSlot.Image = link
+end)
+
+-- Create Console Tab
+local consoleTab = Instance.new("Frame")
+consoleTab.Parent = screenGui
+consoleTab.Size = UDim2.new(0.5, -50, 0.5, -100)
+consoleTab.Position = UDim2.new(0.5, 50, 0.5, -100)
+consoleTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+consoleTab.Visible = false
+
+local consoleTextBox = Instance.new("TextBox")
+consoleTextBox.Parent = consoleTab
+consoleTextBox.Size = UDim2.new(1, 0, 1, 0)
+consoleTextBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+consoleTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+consoleTextBox.Font = Enum.Font.Code
+consoleTextBox.TextSize = 14
+consoleTextBox.ClearTextOnFocus = false
+consoleTextBox.PlaceholderText = "Type anything..."
+
+consoleTextBox.FocusLost:Connect(function()
+    if consoleTextBox.Text ~= "" then
+        local success, result = pcall(loadstring(consoleTextBox.Text))
+        if not success then
+            consoleTextBox.TextColor3 = Color3.fromRGB(255, 0, 0)
+            consoleTextBox.Text = "Error: " .. result
+        else
+            consoleTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            consoleTextBox.Text = tostring(result)
+        end
+    end
+end)
+
+-- Toggle Console Tab
+local consoleButton = Instance.new("TextButton")
+consoleButton.Parent = topBar
+consoleButton.Size = UDim2.new(0, 60, 0, 30)
+consoleButton.Position = UDim2.new(1, -110, 0, 0)
+consoleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+consoleButton.Text = "Console"
+consoleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+consoleButton.Font = Enum.Font.Gotham
+consoleButton.TextSize = 14
+
+consoleButton.MouseButton1Click:Connect(function()
+    toggleVisibility(consoleTab)
+end)
