@@ -1,254 +1,298 @@
+-- Main Script for Advanced Roblox Executor GUI
+
 -- Services
-local userInputService = game:GetService("UserInputService")
-local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
--- Create ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = playerGui
-screenGui.Name = "ExecutorGUI"
+-- Main GUI setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ExecutorGUI"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Create Main Frame
-local frame = Instance.new("Frame")
-frame.Parent = screenGui
-frame.Size = UDim2.new(0, 400, 0, 200)
-frame.Position = UDim2.new(0.5, -200, 0.5, -100)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BackgroundTransparency = 0.2
-frame.BorderSizePixel = 0
-frame.Visible = true
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 500, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+MainFrame.BackgroundTransparency = 0.5
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
 
--- Add Shadow Effect
-local shadow = Instance.new("ImageLabel")
-shadow.Parent = frame
-shadow.Size = UDim2.new(1, 20, 1, 20)
-shadow.Position = UDim2.new(0, -10, 0, -10)
-shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217"
-shadow.ImageColor3 = Color3.new(0, 0, 0)
-shadow.ImageTransparency = 0.7
+-- Drop shadow effect
+local Shadow = Instance.new("ImageLabel")
+Shadow.Parent = MainFrame
+Shadow.Size = UDim2.new(1, 20, 1, 20)
+Shadow.Position = UDim2.new(0, -10, 0, -10)
+Shadow.BackgroundTransparency = 1
+Shadow.Image = "rbxassetid://1316045217"
+Shadow.ImageTransparency = 0.6
+Shadow.ScaleType = Enum.ScaleType.Slice
+Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
 
--- Add Top Bar
-local topBar = Instance.new("Frame")
-topBar.Parent = frame
-topBar.Size = UDim2.new(1, 0, 0, 30)
-topBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-topBar.BorderSizePixel = 0
+-- Smooth UI corners
+local UICornerMain = Instance.new("UICorner")
+UICornerMain.CornerRadius = UDim.new(0, 10)
+UICornerMain.Parent = MainFrame
 
--- Title Label
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Parent = topBar
-titleLabel.Size = UDim2.new(1, -80, 1, 0)
-titleLabel.Position = UDim2.new(0, 10, 0, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Executor GUI"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextSize = 16
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+-- Top bar setup
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TopBar.BorderSizePixel = 0
 
--- Close Button
-local closeButton = Instance.new("TextButton")
-closeButton.Parent = topBar
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -40, 0, 0)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextSize = 18
+local UICornerTopBar = Instance.new("UICorner")
+UICornerTopBar.CornerRadius = UDim.new(0, 0) -- No rounding for top corners
+UICornerTopBar.Parent = TopBar
 
--- Settings Button
-local settingsButton = Instance.new("TextButton")
-settingsButton.Parent = topBar
-settingsButton.Size = UDim2.new(0, 60, 0, 30)
-settingsButton.Position = UDim2.new(0, 10, 0, 0)
-settingsButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-settingsButton.Text = "Settings"
-settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-settingsButton.Font = Enum.Font.Gotham
-settingsButton.TextSize = 14
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Parent = TopBar
+Title.Size = UDim2.new(1, -100, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Text = "TGM's Advanced Executor"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
 
--- Settings Panel
-local settingsPanel = Instance.new("ScrollingFrame")
-settingsPanel.Parent = screenGui
-settingsPanel.Size = UDim2.new(0, 300, 0, 200)
-settingsPanel.Position = UDim2.new(0.5, 50, 0.5, -100)
-settingsPanel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-settingsPanel.BackgroundTransparency = 0.1
-settingsPanel.BorderSizePixel = 0
-settingsPanel.Visible = false
-settingsPanel.CanvasSize = UDim2.new(0, 0, 0, 300)
+-- Minimize button
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Parent = TopBar
+MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -80, 0, 5)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+MinimizeButton.Text = "-"
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.TextSize = 14
 
--- UNLOAD Button
-local unloadButton = Instance.new("TextButton")
-unloadButton.Parent = settingsPanel
-unloadButton.Size = UDim2.new(0.8, 0, 0, 40)
-unloadButton.Position = UDim2.new(0.1, 0, 0.1, 0)
-unloadButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-unloadButton.Text = "UNLOAD"
-unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-unloadButton.Font = Enum.Font.GothamBold
-unloadButton.TextSize = 16
+local UICornerMinimize = Instance.new("UICorner")
+UICornerMinimize.CornerRadius = UDim.new(0, 5)
+UICornerMinimize.Parent = MinimizeButton
 
--- Draggable Top Bar
-local dragging, dragStart, startPos
-topBar.InputBegan:Connect(function(input)
+-- Exit button
+local ExitButton = Instance.new("TextButton")
+ExitButton.Parent = TopBar
+ExitButton.Size = UDim2.new(0, 30, 0, 30)
+ExitButton.Position = UDim2.new(1, -40, 0, 5)
+ExitButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+ExitButton.Text = "X"
+ExitButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+ExitButton.Font = Enum.Font.GothamBold
+ExitButton.TextSize = 14
+
+local UICornerExit = Instance.new("UICorner")
+UICornerExit.CornerRadius = UDim.new(0, 5)
+UICornerExit.Parent = ExitButton
+
+-- Make TopBar Draggable
+local dragging = false
+local dragInput, dragStart, startPos
+
+TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
         dragStart = input.Position
-        startPos = frame.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
     end
 end)
 
-topBar.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+TopBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
         local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        MainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
     end
 end)
 
-topBar.InputEnded:Connect(function(input)
+-- Content Area
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Parent = MainFrame
+ContentFrame.Size = UDim2.new(1, 0, 1, -40)
+ContentFrame.Position = UDim2.new(0, 0, 0, 40)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ContentFrame.BorderSizePixel = 0
+ContentFrame.BackgroundTransparency = 0.5
+
+-- Tabs Setup
+local TabContainer = Instance.new("Frame")
+TabContainer.Parent = ContentFrame
+TabContainer.Size = UDim2.new(1, 0, 0, 30)
+TabContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TabContainer.BackgroundTransparency = 0.5
+
+local Tabs = {
+    "Console",
+    "Scripts",
+    "Settings"
+}
+
+local TabPages = {}
+
+for i, tabName in ipairs(Tabs) do
+    local TabButton = Instance.new("TextButton")
+    TabButton.Parent = TabContainer
+    TabButton.Size = UDim2.new(0, 100, 1, 0)
+    TabButton.Position = UDim2.new(0, (i - 1) * 100, 0, 0)
+    TabButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    TabButton.Text = tabName
+    TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabButton.Font = Enum.Font.GothamBold
+    TabButton.TextSize = 14
+
+    local Page = Instance.new("Frame")
+    Page.Parent = ContentFrame
+    Page.Size = UDim2.new(1, 0, 1, -30)
+    Page.Position = UDim2.new(0, 0, 0, 30)
+    Page.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    Page.BackgroundTransparency = 0.5
+    Page.Visible = i == 1
+    TabPages[tabName] = Page
+
+    TabButton.MouseButton1Click:Connect(function()
+        for _, tabPage in pairs(TabPages) do
+            tabPage.Visible = false
+        end
+        Page.Visible = true
+    end)
+end
+
+-- Scripts Tab Content
+local scripts = {
+    {"Rivals", "Some shitty rivals script with key", "print(\"Running Script 1\")"},
+    {"Rivals", "Some shitty rivals script with key", "print(\"Running Script 2\")"},
+    {"Rivals", "Some shitty rivals script with key", "print(\"Running Script 3\")"},
+    {"Rivals", "Some shitty rivals script with key", "print(\"Running Script 4\")"},
+    {"Rivals", "Some shitty rivals script with key", "print(\"Running Script 5\")"},
+}
+
+for i, script in ipairs(scripts) do
+    local ScriptFrame = Instance.new("Frame")
+    ScriptFrame.Parent = TabPages["Scripts"]
+    ScriptFrame.Size = UDim2.new(1, -20, 0, 40)
+    ScriptFrame.Position = UDim2.new(0, 10, 0, 10 + (i - 1) * 50)
+    ScriptFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+    local UICornerScript = Instance.new("UICorner")
+    UICornerScript.CornerRadius = UDim.new(0, 5)
+    UICornerScript.Parent = ScriptFrame
+
+    local ScriptButton = Instance.new("TextButton")
+    ScriptButton.Parent = ScriptFrame
+    ScriptButton.Size = UDim2.new(0.7, 0, 1, 0)
+    ScriptButton.Position = UDim2.new(0, 0, 0, 0)
+    ScriptButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    ScriptButton.Text = script[1]
+    ScriptButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ScriptButton.Font = Enum.Font.GothamBold
+    ScriptButton.TextSize = 14
+
+    local ExecuteButton = Instance.new("TextButton")
+    ExecuteButton.Parent = ScriptFrame
+    ExecuteButton.Size = UDim2.new(0.3, 0, 1, 0)
+    ExecuteButton.Position = UDim2.new(0.7, 0, 0, 0)
+    ExecuteButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    ExecuteButton.Text = "EXECUTE"
+    ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ExecuteButton.Font = Enum.Font.GothamBold
+    ExecuteButton.TextSize = 14
+
+    ScriptButton.MouseButton1Click:Connect(function()
+        print("Selected: " .. script[2]) -- Replace with selection logic
+    end)
+
+    ExecuteButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/OhhMyGehlee/fo/refs/heads/main/ot"))()
+    end)
+end
+
+-- Settings Tab Content
+local UnloadButton = Instance.new("TextButton")
+UnloadButton.Parent = TabPages["Settings"]
+UnloadButton.Size = UDim2.new(0, 100, 0, 30)
+UnloadButton.Position = UDim2.new(0, 10, 0, 10)
+UnloadButton.BackgroundColor3 = Color3.fromRGB(70, 0, 0)
+UnloadButton.Text = "Unload"
+UnloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+UnloadButton.Font = Enum.Font.GothamBold
+UnloadButton.TextSize = 14
+UnloadButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Resizable Functionality
+local resizing = false
+local startPos
+local startSize
+
+local ResizeCorner = Instance.new("Frame")
+ResizeCorner.Parent = MainFrame
+ResizeCorner.Size = UDim2.new(0, 20, 0, 20)
+ResizeCorner.Position = UDim2.new(1, -20, 1, -20)
+ResizeCorner.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ResizeCorner.BackgroundTransparency = 0.5
+
+local UICornerResize = Instance.new("UICorner")
+UICornerResize.CornerRadius = UDim.new(0, 5)
+UICornerResize.Parent = ResizeCorner
+
+ResizeCorner.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
+        resizing = true
+        startPos = UIS:GetMouseLocation()
+        startSize = MainFrame.Size
     end
 end)
 
--- Toggle Visibility
-local function toggleVisibility(gui)
-    gui.Visible = not gui.Visible
-end
-
--- Connect Buttons
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
-
-settingsButton.MouseButton1Click:Connect(function()
-    toggleVisibility(settingsPanel)
-end)
-
-unloadButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
-
--- Listen for Ctrl Key
-userInputService.InputBegan:Connect(function(input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode.LeftControl and not gameProcessed then
-        toggleVisibility(frame)
+UIS.InputChanged:Connect(function(input)
+    if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = UIS:GetMouseLocation() - startPos
+        MainFrame.Size = UDim2.new(0, math.max(300, startSize.X.Offset + delta.X), 0, math.max(200, startSize.Y.Offset + delta.Y))
     end
 end)
 
--- Resize functionality
-local function resizeElement(element)
-    local resize
-    local dragging
-    local dragStart
-    local startSize
-
-    local function startDrag(input)
-        dragStart = input.Position
-        startSize = element.Size
-        dragging = true
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = false
     end
-
-    local function drag(input)
-        if dragging then
-            local delta = input.Position - dragStart
-            element.Size = UDim2.new(startSize.X.Scale, startSize.X.Offset + delta.X, startSize.Y.Scale, startSize.Y.Offset + delta.Y)
-        end
-    end
-
-    local function stopDrag()
-        dragging = false
-    end
-
-    element.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            startDrag(input)
-        end
-    end)
-
-    element.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            drag(input)
-        end
-    end)
-
-    element.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            stopDrag()
-        end
-    end)
-end
-
--- Create Image Slot
-local imageSlot = Instance.new("ImageLabel")
-imageSlot.Parent = frame
-imageSlot.Size = UDim2.new(0, 150, 0, 150)
-imageSlot.Position = UDim2.new(0, 0, 0.5, -75)
-imageSlot.BackgroundTransparency = 1
-imageSlot.BorderSizePixel = 0
-imageSlot.AnchorPoint = Vector2.new(0, 0.5)
-
--- Input Field for Image Link
-local imageInput = Instance.new("TextBox")
-imageInput.Parent = imageSlot
-imageInput.Size = UDim2.new(1, 0, 0, 30)
-imageInput.Position = UDim2.new(0, 0, 1, -30)
-imageInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-imageInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-imageInput.Font = Enum.Font.Code
-imageInput.TextSize = 14
-imageInput.PlaceholderText = "https://images-ext-1.discordapp.net/external/JMY2d6KkBvZNr0JtyIpHd1OrtEwpp3PcyT3yAaGz3pM/https/cdn.discordapp.com/avatars/1284999547017367726/e65f711d837609bc75c35e6b098aab08.webp?format=webp"
-imageInput.ClearTextOnFocus = true
-
-imageInput.FocusLost:Connect(function()
-    local link = imageInput.Text
-    imageSlot.Image = link
 end)
 
--- Create Console Tab
-local consoleTab = Instance.new("Frame")
-consoleTab.Parent = screenGui
-consoleTab.Size = UDim2.new(0.5, -50, 0.5, -100)
-consoleTab.Position = UDim2.new(0.5, 50, 0.5, -100)
-consoleTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-consoleTab.Visible = false
+-- Open/Close with Ctrl Key
+local isVisible = true
 
-local consoleTextBox = Instance.new("TextBox")
-consoleTextBox.Parent = consoleTab
-consoleTextBox.Size = UDim2.new(1, 0, 1, 0)
-consoleTextBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-consoleTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-consoleTextBox.Font = Enum.Font.Code
-consoleTextBox.TextSize = 14
-consoleTextBox.ClearTextOnFocus = false
-consoleTextBox.PlaceholderText = "Type anything..."
-
-consoleTextBox.FocusLost:Connect(function()
-    if consoleTextBox.Text ~= "" then
-        local success, result = pcall(loadstring(consoleTextBox.Text))
-        if not success then
-            consoleTextBox.TextColor3 = Color3.fromRGB(255, 0, 0)
-            consoleTextBox.Text = "Error: " .. result
+UIS.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.LeftControl then
+        isVisible = not isVisible
+        if isVisible then
+            MainFrame.Visible = true
+            local goal = {BackgroundTransparency = 0.5}
+            local tween = TweenService:Create(MainFrame, TweenInfo.new(0.5), goal)
+            tween:Play()
         else
-            consoleTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-            consoleTextBox.Text = tostring(result)
+            local goal = {BackgroundTransparency = 1}
+            local tween = TweenService:Create(MainFrame, TweenInfo.new(0.5), goal)
+            tween.Completed:Connect(function()
+                MainFrame.Visible = false
+            end)
+            tween:Play()
         end
     end
-end)
-
--- Toggle Console Tab
-local consoleButton = Instance.new("TextButton")
-consoleButton.Parent = topBar
-consoleButton.Size = UDim2.new(0, 60, 0, 30)
-consoleButton.Position = UDim2.new(1, -110, 0, 0)
-consoleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-consoleButton.Text = "Console"
-consoleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-consoleButton.Font = Enum.Font.Gotham
-consoleButton.TextSize = 14
-
-consoleButton.MouseButton1Click:Connect(function()
-    toggleVisibility(consoleTab)
 end)
